@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIRP - Sistema Inteligente de Redacción Procesal</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Remix Icon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+    
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <!-- Librería para PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo">
+                <div class="logo-icon">⚖️</div>
+                <div>
+                    <h1>SIRP</h1>
+                    <div class="version">v1.0 MVP</div>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <button class="nav-item active" data-tab="dashboard">
+                    <i class="ri-dashboard-line"></i> Panel
+                </button>
+                <button class="nav-item" data-tab="nueva">
+                    <i class="ri-file-add-line"></i> Nueva Acta
+                </button>
+                <button class="nav-item" data-tab="historial">
+                    <i class="ri-history-line"></i> Historial
+                    <span class="badge">47</span>
+                </button>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Gestión</div>
+                <button class="nav-item" data-tab="estadisticas">
+                    <i class="ri-bar-chart-line"></i> Estadísticas
+                </button>
+                <button class="nav-item" data-tab="plantillas">
+                    <i class="ri-file-copy-line"></i> Plantillas
+                </button>
+                <button class="nav-item" data-tab="personas">
+                    <i class="ri-team-line"></i> Personas
+                </button>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Sistema</div>
+                <button class="nav-item" data-tab="config">
+                    <i class="ri-settings-3-line"></i> Configuración
+                </button>
+                <button class="nav-item" data-tab="reportes">
+                    <i class="ri-file-chart-line"></i> Reportes
+                </button>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">AC</div>
+                <div class="user-info">
+                    <div class="name">Ana Correa</div>
+                    <div class="role">Operadora</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <div class="main-content">
+        
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <button class="btn-icon" id="menuBtn" onclick="toggleSidebar()" style="display:none;">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span id="pageTitle">Panel principal</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="ri-search-line"></i>
+                    <span>Buscar actas...</span>
+                </div>
+                <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema">
+                    <i class="ri-sun-line" id="themeIcon"></i>
+                </button>
+                <button class="btn-icon" title="Notificaciones" style="position:relative;">
+                    <i class="ri-notification-3-line"></i>
+                    <span style="position:absolute;top:-4px;right:-4px;background:#e74c3c;color:white;font-size:9px;padding:1px 5px;border-radius:50%;">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <div class="content-area">
+
+            <!-- ===== PANEL DASHBOARD ===== -->
+            <div class="panel active" id="panel-dashboard">
+                
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">📄 Actas este mes</div>
+                        <div class="stat-value">47</div>
+                        <div class="stat-change positive">↑ 12% vs anterior</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">✅ Validación OK</div>
+                        <div class="stat-value">41</div>
+                        <div class="stat-change positive">↑ 87% del total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">⚠️ Con observaciones</div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-change negative">Requieren revisión</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">❌ Con errores</div>
+                        <div class="stat-value">1</div>
+                        <div class="stat-change negative">Campos faltantes</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h4>Actas por mes</h4>
+                        <div class="bar-chart" id="monthlyChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Distribución por tipo</h4>
+                        <div class="donut-container">
+                            <div class="donut">
+                                <svg width="140" height="140" viewBox="0 0 140 140">
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#e9ecef" stroke-width="20"/>
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#1a472a" stroke-width="20" stroke-dasharray="105 209" stroke-dashoffset="0"/>
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#2d6b44" stroke-width="20" stroke-dasharray="65 209" stroke-dashoffset="-105"/>
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#27ae60" stroke-width="20" stroke-dasharray="50 209" stroke-dashoffset="-170"/>
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#f39c12" stroke-width="20" stroke-dasharray="39 209" stroke-dashoffset="-220"/>
+                                </svg>
+                                <div class="center">
+                                    <div class="number">213</div>
+                                    <div class="label">Total</div>
+                                </div>
+                            </div>
+                            <div class="legend">
+                                <div class="legend-item"><span class="dot" style="background:#1a472a;"></span> Procedimiento 33%</div>
+                                <div class="legend-item"><span class="dot" style="background:#2d6b44;"></span> Requisa 21%</div>
+                                <div class="legend-item"><span class="dot" style="background:#27ae60;"></span> Cadena custodia 17%</div>
+                                <div class="legend-item"><span class="dot" style="background:#f39c12;"></span> Otros 29%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Actas -->
+                <div class="section-header">
+                    <h3>📋 Últimas actas</h3>
+                    <div class="actions">
+                        <button class="btn btn-primary" onclick="switchTab('nueva')">
+                            <i class="ri-add-line"></i> Nueva acta
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Acta</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="actasTable"></tbody>
+                    </table>
+                </div>
+
+                <!-- Alerts -->
+                <div class="section-header">
+                    <h3>🔔 Validaciones pendientes</h3>
+                </div>
+                <div class="alerts-container" id="alertsContainer"></div>
+            </div>
+
+            <!-- ===== PANEL NUEVA ACTA ===== -->
+            <div class="panel" id="panel-nueva">
+                <div style="margin-bottom:20px; color:var(--text-secondary);">
+                    Seleccioná el tipo de documento y completá los datos del procedimiento.
+                </div>
+                
+                <h4 style="margin-bottom:12px; font-size:13px; color:var(--text-secondary);">Tipo de documento</h4>
+                <div class="tipo-grid" id="tipoGrid">
+                    <div class="tipo-card selected" data-tipo="procedimiento">
+                        <i class="ri-file-text-line"></i>
+                        <div class="tipo-name">Procedimiento</div>
+                        <div class="tipo-desc">Acta general</div>
+                    </div>
+                    <div class="tipo-card" data-tipo="constatacion">
+                        <i class="ri-file-search-line"></i>
+                        <div class="tipo-name">Constatación</div>
+                        <div class="tipo-desc">Verificación in situ</div>
+                    </div>
+                    <div class="tipo-card" data-tipo="requisa">
+                        <i class="ri-user-search-line"></i>
+                        <div class="tipo-name">Requisa</div>
+                        <div class="tipo-desc">Revisión persona/vehículo</div>
+                    </div>
+                    <div class="tipo-card" data-tipo="allanamiento">
+                        <i class="ri-home-search-line"></i>
+                        <div class="tipo-name">Allanamiento</div>
+                        <div class="tipo-desc">Ingreso domicilio</div>
+                    </div>
+                    <div class="tipo-card" data-tipo="secuestro">
+                        <i class="ri-lock-line"></i>
+                        <div class="tipo-name">Secuestro</div>
+                        <div class="tipo-desc">Elementos incautados</div>
+                    </div>
+                    <div class="tipo-card" data-tipo="custodia">
+                        <i class="ri-links-line"></i>
+                        <div class="tipo-name">Cadena de custodia</div>
+                        <div class="tipo-desc">Control de evidencia</div>
+                    </div>
+                </div>
+
+                <h4 style="margin:16px 0 12px; font-size:13px; color:var(--text-secondary);">Datos del procedimiento</h4>
+                <form id="nuevaActaForm" onsubmit="guardarActa(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" required value="2026-05-06">
+                        </div>
+                        <div class="form-group">
+                            <label>Hora inicio</label>
+                            <input type="time" required value="08:30">
+                        </div>
+                        <div class="form-group">
+                            <label>Lugar / dirección</label>
+                            <input type="text" placeholder="Ej: Ruta 11 km 42, Clorinda" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fuerza / dependencia</label>
+                            <select required>
+                                <option>Gendarmería Nacional</option>
+                                <option>Policía Provincia</option>
+                                <option>Policía Federal</option>
+                                <option>Prefectura Naval</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Preventores actuantes</label>
+                            <input type="text" placeholder="Nombres y jerarquías" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Jurisdicción</label>
+                            <select required>
+                                <option>Formosa</option>
+                                <option>Chaco</option>
+                                <option>Corrientes</option>
+                                <option>Misiones</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                        <button type="button" class="btn" onclick="switchTab('dashboard')">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-arrow-right-line"></i> Continuar →
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===== PANEL HISTORIAL ===== -->
+            <div class="panel" id="panel-historial">
+                <div class="section-header">
+                    <h3>📜 Historial de actas</h3>
+                    <div class="actions">
+                        <select style="padding:6px 12px; border-radius:8px; border:1px solid var(--border-color); font-size:12px; background:var(--bg-primary);">
+                            <option>Todos los tipos</option>
+                            <option>Procedimiento</option>
+                            <option>Requisa</option>
+                            <option>Cadena de custodia</option>
+                        </select>
+                        <select style="padding:6px 12px; border-radius:8px; border:1px solid var(--border-color); font-size:12px; background:var(--bg-primary);">
+                            <option>Mayo 2026</option>
+                            <option>Abril 2026</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Acta</th>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialTable"></tbody>
+                    </table>
+                </div>
+                <div style="text-align:center; font-size:12px; color:var(--text-secondary);">
+                    Mostrando 4 de 47 registros este mes
+                </div>
+            </div>
+
+            <!-- ===== PANEL ESTADÍSTICAS ===== -->
+            <div class="panel" id="panel-estadisticas">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">📊 Actas totales</div>
+                        <div class="stat-value">213</div>
+                        <div class="stat-change positive">↑ Desde enero 2026</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">📄 Exportaciones PDF</div>
+                        <div class="stat-value">198</div>
+                        <div class="stat-change positive">↑ 93% completadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">⚠️ Errores procesales</div>
+                        <div class="stat-value">7</div>
+                        <div class="stat-change negative">↓ 3.2% del total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">👥 Usuarios activos</div>
+                        <div class="stat-value">4</div>
+                        <div class="stat-change">Operadores</div>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h4>Actas por mes (detalle)</h4>
+                        <div class="bar-chart" id="detailedChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Actas por estado</h4>
+                        <div class="donut-container">
+                            <div class="donut">
+                                <svg width="140" height="140" viewBox="0 0 140 140">
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#e9ecef" stroke-width="20"/>
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#27ae60" stroke-width="20" stroke-dasharray="160 209" stroke-dashoffset="0"/>
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#f39c12" stroke-width="20" stroke-dasharray="35 209" stroke-dashoffset="-160"/>
+                                    <circle cx="70" cy="70" r="50" fill="none" stroke="#e74c3c" stroke-width="20" stroke-dasharray="14 209" stroke-dashoffset="-195"/>
+                                </svg>
+                                <div class="center">
+                                    <div class="number">213</div>
+                                    <div class="label">Total</div>
+                                </div>
+                            </div>
+                            <div class="legend">
+                                <div class="legend-item"><span class="dot" style="background:#27ae60;"></span> Finalizadas 75%</div>
+                                <div class="legend-item"><span class="dot" style="background:#f39c12;"></span> En proceso 16%</div>
+                                <div class="legend-item"><span class="dot" style="background:#e74c3c;"></span> Pendientes 9%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PANEL PLANTILLAS ===== -->
+            <div class="panel" id="panel-plantillas">
+                <div style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+                    Plantillas institucionales disponibles. Editables por jurisdicción.
+                </div>
+                <div class="tipo-grid">
+                    <div class="tipo-card">
+                        <i class="ri-file-text-line"></i>
+                        <div class="tipo-name">GN — Procedimiento</div>
+                        <div class="tipo-desc">Gendarmería Nacional</div>
+                    </div>
+                    <div class="tipo-card">
+                        <i class="ri-file-search-line"></i>
+                        <div class="tipo-name">PFA — Constatación</div>
+                        <div class="tipo-desc">Policía Federal</div>
+                    </div>
+                    <div class="tipo-card">
+                        <i class="ri-links-line"></i>
+                        <div class="tipo-name">GN — Cadena custodia</div>
+                        <div class="tipo-desc">Estándar INDEC</div>
+                    </div>
+                    <div class="tipo-card" style="border-style:dashed; border-color:var(--gray-400);">
+                        <i class="ri-add-line" style="color:var(--text-secondary);"></i>
+                        <div class="tipo-name">Nueva plantilla</div>
+                        <div class="tipo-desc">Personalizada</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PANEL PERSONAS ===== -->
+            <div class="panel" id="panel-personas">
+                <div class="section-header">
+                    <h3>👤 Personas registradas</h3>
+                    <div class="actions">
+                        <button class="btn btn-primary"><i class="ri-add-line"></i> Agregar persona</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Rol</th>
+                                <th>Jurisdicción</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Ana Correa</strong></td>
+                                <td>Operadora</td>
+                                <td>Formosa</td>
+                                <td><span class="badge badge-success">Activo</span></td>
+                                <td>
+                                    <button class="action-btn"><i class="ri-edit-line"></i></button>
+                                    <button class="action-btn"><i class="ri-more-2-line"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Carlos Gómez</strong></td>
+                                <td>Supervisor</td>
+                                <td>Chaco</td>
+                                <td><span class="badge badge-success">Activo</span></td>
+                                <td>
+                                    <button class="action-btn"><i class="ri-edit-line"></i></button>
+                                    <button class="action-btn"><i class="ri-more-2-line"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== PANEL CONFIGURACIÓN ===== -->
+            <div class="panel" id="panel-config">
+                <h3 style="margin-bottom:16px;">⚙️ Configuración del sistema</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Institución predeterminada</label>
+                        <select>
+                            <option>Gendarmería Nacional</option>
+                            <option>Policía Federal</option>
+                            <option>Policía Provincia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jurisdicción predeterminada</label>
+                        <select>
+                            <option>Formosa</option>
+                            <option>Chaco</option>
+                            <option>Corrientes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tema visual</label>
+                        <select id="themeSelect" onchange="setTheme(this.value)">
+                            <option value="light">Claro</option>
+                            <option value="dark">Oscuro</option>
+                            <option value="system">Sistema</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Carpeta de exportación</label>
+                        <input type="text" value="C:\Procedimientos\">
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                    <button class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </div>
+
+            <!-- ===== PANEL REPORTES ===== -->
+            <div class="panel" id="panel-reportes">
+                <div class="section-header">
+                    <h3>📊 Reportes</h3>
+                    <div class="actions">
+                        <button class="btn btn-primary"><i class="ri-download-line"></i> Exportar</button>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Reportes generados</div>
+                        <div class="stat-value">32</div>
+                        <div class="stat-change positive">↑ +5% vs anterior</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Descargados</div>
+                        <div class="stat-value">28</div>
+                        <div class="stat-change positive">↑ 87.5%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Pendientes</div>
+                        <div class="stat-value">4</div>
+                        <div class="stat-change negative">Requieren atención</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Último reporte</div>
+                        <div class="stat-value" style="font-size:16px;">06/05/2026</div>
+                        <div class="stat-change">Acta de procedimiento</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end content-area -->
+    </div><!-- end main-content -->
+
+    <!-- ========== MODAL ========== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nuevo elemento</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- ========== SCRIPTS ========== -->
+    <script src="js/app.js"></script>
+</body>
+</html>
